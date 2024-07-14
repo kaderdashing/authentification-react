@@ -4,7 +4,7 @@ import * as auth from '../provider-auth';
 async function client(endpoint, { data, headers: customHeaders, ...customConfig } = {}) {
   const config = {
     method: data ? 'POST' : 'GET',
-    body: data ? JSON.stringify(data) : undefined,
+    body: data ? JSON.stringify(data) : undefinedclient,
     headers: {
       Authorization: undefined,
       'Content-Type': data ? 'application/json' : undefined,

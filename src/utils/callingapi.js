@@ -7,7 +7,6 @@ function getUser() {
 const getCustomerId = async (data) => {
   try {
     const response = await client('check-account', { data });
-    console.log({ youcef: response });
     return response;
   } catch (error) {
     console.error('Error fetching customer ID:', error);
