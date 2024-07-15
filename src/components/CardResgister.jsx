@@ -6,61 +6,37 @@ import MyTextInput from '../core/MyTextInput';
 import MySelect from '../core/MySelect';
 import SimpleWhiteCard from '../core/Card/SimpleWhiteCard';
 import { useDebouncedValue } from '@/Hook/useDebouncedValue';
-import { getCustomerId } from '@/utils/callingapi';
+import { getCustomerInfo } from '@/utils/callingapi';
 import ModalTailwind from '@/core/modal/ModalTailwind';
 import { useQuery } from 'react-query';
 import FullPageSpinner from './pageRendu/FullPageSpinner';
 import { passwordSchema } from '@/ schema/PasswordSchema';
-// export default function CardResgister({ handleSubmit, customClass }) {
-//   const [errorcustomer, setErrorcustomer] = useState(0);
-//   const [inputValue, setInputValue] = useState('');
-//   const [customerId, setCustomerId] = useState({});
-//   const [company, setCompany] = useState({});
-
-//   const debouncedValue = useDebouncedValue(inputValue, 500);
-
-//   useEffect(() => {
-//     const fetchCustomerId = async () => {
-//       if (debouncedValue) {
-//         try {
-//           const data = { id: debouncedValue };
-//           const customerId = await getCustomerId(data);
-//           setCustomerId(customerId);
-//           setCompany(customerId.customer[0]);
-//         } catch (error) {
-//           console.error('Failed to fetch customer ID:', error);
-//           setErrorcustomer(1);
-//         }
-//       }
-//     };
-//     fetchCustomerId();
-//   }, [debouncedValue]);
+import CustomerInfo from '@/pages/unAuthApp/Test';
+import { parseMessage } from '@/Hook/parseMessage';
 export default function CardRegister({ handleSubmit, customClass }) {
   const [errorCustomer, setErrorCustomer] = useState(0);
   const [inputValue, setInputValue] = useState('');
   const [customerId, setCustomerId] = useState({});
   const [company, setCompany] = useState({});
-  const [password, setPassword] = useState('');
-  const [confirmedPassword, setConfirmedPassword] = useState('');
-  const [validation, setValidation] = useState(true);
+  const [customerInfo, setCustomerInfo] = useState(null);
 
-  const getCharacterValidationError = (str) => {
-    return `Your password must have at least 1 ${str} character`;
-  };
+  // const [password, setPassword] = useState('');
   const debouncedValue = useDebouncedValue(inputValue, 1000);
   //here we will recover data (Adresse .. city ......) from the CustumerID with debounced value
-
   const fetchCustomerId = async () => {
-    const data = { id: debouncedValue };
-    const customerId = await getCustomerId(data);
-    return customerId;
+    // const data = { debouncedValue };
+    const customerValue = await getCustomerInfo(debouncedValue);
+    return customerValue;
   };
   const { data, error, isLoading } = useQuery(['customerId', debouncedValue], fetchCustomerId, {
     enabled: !!debouncedValue,
     retry: false,
     onSuccess: (data) => {
       setCustomerId(data);
-      data.customer.length > 0 ? setCompany(data.customer[0]) : setCompany(null);
+      // console.log(data);
+      setCompany(data);
+      const parsedMessage = parseMessage(data);
+      setCustomerInfo(parsedMessage);
     },
     onError: () => {
       console.error('Failed to fetch customer ID:', error);
@@ -69,12 +45,17 @@ export default function CardRegister({ handleSubmit, customClass }) {
   });
 
   useEffect(() => {
+    console.log({ CustomerInfo: customerInfo });
+  }, [customerInfo]);
+
+  useEffect(() => {
     if (!debouncedValue) {
       setCustomerId({});
       setCompany({});
       setErrorCustomer(0);
     }
   }, [debouncedValue]);
+  // function qui va transformer en object la grosse chaine de charactére a chaque fois qu"elle trouve /n
 
   return (
     <div className="flex justify-center items-center" style={{ height: '95%' }}>
@@ -111,38 +92,15 @@ export default function CardRegister({ handleSubmit, customClass }) {
           city: '',
           prov: '',
           zip: '',
-
           acceptedTerms: true, // added for our checkbox
           country: '' // added for our select
         }}
-        validationSchema={Yup.object({
-          firstName: Yup.string().max(40, 'Must be 40 characters or less').required('Required'),
-          kader: Yup.string().max(40, 'Must be 40 characters or less').required('Required'),
-
-          lastName: Yup.string().max(40, 'Must be 40 characters or less').required('Required'),
-          jobTitle: Yup.string().max(40, 'Must be 40 characters or less').required('Required'),
-          email: Yup.string().email('Invalid email address').required('Required'),
-          password: Yup.string()
-            .required('Please enter a password')
-            .min(8, 'Password must have at least 8 characters')
-            .matches(/[0-9]/, getCharacterValidationError('digit'))
-            .matches(/[a-z]/, getCharacterValidationError('lowercase'))
-            .matches(/[A-Z]/, getCharacterValidationError('uppercase')),
-          confirmPassword: Yup.string()
-            .required('Please re-type your password')
-            .oneOf([Yup.ref('password')], 'Passwords do not match'),
-          acceptedTerms: Yup.boolean()
-            .required('Required')
-            .oneOf([true], 'You must accept the terms and conditions.'),
-          country: Yup.string()
-            .oneOf(['designer', 'development', 'product', 'other'], 'Invalid Job Type')
-            .required('Required')
-        })}
+        validationSchema={passwordSchema}
         onSubmit={(values, { setSubmitting }) => {
           console.log(values);
           setSubmitting(false);
         }}>
-        {({ isSubmitting, isValid, dirty }) => (
+        {({ isSubmitting, isValid }) => (
           <Form className="h-full w-full" onSubmit={handleSubmit}>
             <div className={`flex justify-center items-center h-full ${customClass} `}>
               <CardShadow
@@ -152,18 +110,18 @@ export default function CardRegister({ handleSubmit, customClass }) {
                     <MyTextInput
                       label="Customer ID"
                       name="id"
-                      type="number"
+                      type="text"
                       placeholder="9348219"
                       autoFocus
+                      value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
-                      // onChange={(e) => console.log(e.target.value)}
                     />
                     <MyTextInput
                       label="Company Name"
                       name="companyName"
                       type="text"
                       placeholder="Meta"
-                      value={company?.name || ''}
+                      value={customerInfo?.Name || ''}
                       onChange={(e) => setCompany(e.target.value)}
                     />
                     <MyTextInput
@@ -171,7 +129,7 @@ export default function CardRegister({ handleSubmit, customClass }) {
                       name="companyPhone"
                       type="number"
                       placeholder="1 234 432 235"
-                      value={company?.num || ''}
+                      value={customerInfo?.Company || ''}
                       onChange={(e) => setCompany(e.target.value)}
                     />
                   </SimpleWhiteCard>
@@ -203,8 +161,6 @@ export default function CardRegister({ handleSubmit, customClass }) {
                       name="password"
                       type="password"
                       placeholder="password"
-                      // value={password}
-                      // onChange={(e) => setPassword(e.target.value)}
                     />
 
                     <MyTextInput
@@ -212,8 +168,6 @@ export default function CardRegister({ handleSubmit, customClass }) {
                       name="confirmPassword"
                       type="password"
                       placeholder="confirmPassword"
-                      // value={confirmedPassword}
-                      // onChange={(e) => setConfirmedPassword(e.target.value)}
                     />
                   </SimpleWhiteCard>{' '}
                 </div>
@@ -224,8 +178,8 @@ export default function CardRegister({ handleSubmit, customClass }) {
                       name="firstAdresse"
                       type="text"
                       placeholder="Jane123 Rue Maple Ville-de-Québec, QC G1X 3X9"
+                      value={customerInfo?.Address1 || ''}
                     />
-
                     <MyTextInput
                       label="Adresse 2"
                       name="secondAdresse"
@@ -239,12 +193,22 @@ export default function CardRegister({ handleSubmit, customClass }) {
                       type="text"
                       placeholder="optional"
                     />
-                    <MyTextInput
-                      label="City"
-                      name="city"
-                      type="text"
-                      placeholder="Plateau-Mont-Royal"
-                    />
+                    <div className="lg:flex lg:flex-row justify-between w-full lg:space-x-6">
+                      <MyTextInput
+                        label="City"
+                        name="city"
+                        type="text"
+                        placeholder="Plateau-Mont-Royal"
+                        value={customerInfo?.City || ''}
+                      />
+                      <MyTextInput
+                        label="Phone"
+                        name="PhoneNum"
+                        type="text"
+                        placeholder="Québec"
+                        value={customerInfo?.PhoneNum || ''}
+                      />
+                    </div>
                     <div className="lg:flex lg:flex-row justify-between w-full lg:space-x-6">
                       {' '}
                       <MyTextInput
@@ -252,6 +216,7 @@ export default function CardRegister({ handleSubmit, customClass }) {
                         name="prov"
                         type="text"
                         placeholder="Québec"
+                        value={customerInfo?.State || ''}
                       />
                       <MyTextInput
                         label="Postal / ZIP"
@@ -260,11 +225,15 @@ export default function CardRegister({ handleSubmit, customClass }) {
                         placeholder="H2X 1Y6"
                       />
                     </div>
-                    <MySelect label="country" name="country">
-                      <option value="">Select a country</option>
-                      <option value="designer">Designer</option>
-                      <option value="development">Developer</option>
-                      <option value="product">Product Manager</option>
+
+                    <MySelect label="country" name="Country">
+                      <option value={customerInfo?.Country || ''}>
+                        {customerInfo?.Country || 'Select a country'}
+                      </option>
+                      <option value="">USA</option>
+                      <option value="">ALLEMAGENE</option>
+                      <option value="">FRANCE</option>
+                      <option value="">CANADA</option>
                       <option value="other">Other</option>
                     </MySelect>
                   </SimpleWhiteCard>{' '}

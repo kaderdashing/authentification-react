@@ -1,61 +1,67 @@
-import { useDebouncedValue } from '@/Hook/useDebouncedValue';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-export default function Test() {
-  const [customerId, setCustomerId] = useState('');
-  const [result, setResult] = useState(null); // État pour stocker le résultat de la requête
+const CustomerInfo = () => {
+  const [customerInfo, setCustomerInfo] = useState(null);
 
-  // Utilisation du hook useDebouncedValue pour obtenir une version débouncée de customerId
-  const debouncedCustomerId = useDebouncedValue(customerId, 500);
+  const getCustomerInfo = async () => {
+    try {
+      const response = await fetch(
+        'https://cadcentraldtpilot01.epicorsaas.com/SaaS511Pilot/api/v2/efx/157541/PortalPublic/GetCustomerInfo',
+        {
+          method: 'POST',
+          headers: {
+            'x-api-key': 'bZ9LNk3CiPj8O4pZfFEaSh2LFOJLBSsiLvkuX03BCqQdd',
+            Authorization: 'Basic d2VidXNlcjpteVBhc3MyMDIxIQ==',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ Custid: 'ERI100' })
+        }
+      );
 
-  useEffect(() => {
-    const handleSubmit = async () => {
-      try {
-        const response = await fetch(
-          'https://backideal-api-server-xryf2.ondigitalocean.app/api/check-account',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: debouncedCustomerId }) // Utilisation de la version débouncée
-          }
-        );
-        const data = await response.json();
-        setResult(data); // Stocker le résultat de la requête dans l'état
-      } catch (error) {
-        console.error('Error:', error);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
 
-    // Vérifiez si la valeur débordée est définie, puis soumettez la requête
-    if (debouncedCustomerId) {
-      handleSubmit();
+      const data = await response.json();
+      const parsedMessage = parseMessage(data.oMessage);
+      setCustomerInfo(parsedMessage);
+    } catch (error) {
+      console.error('Error fetching customer info:', error);
     }
-  }, [debouncedCustomerId]);
+  };
 
-  const handleChange = (e) => {
-    setCustomerId(e.target.value);
+  const parseMessage = (message) => {
+    const lines = message.split('\n');
+    const result = {};
+    lines.forEach((line) => {
+      const [key, value] = line.split(': ');
+      result[key] = value;
+    });
+    return result;
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Customer ID</label>
-        <input
-          type="text"
-          name="id"
-          value={customerId}
-          onChange={handleChange}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-        {result && (
-          <div className="mt-4">
-            <h3 className="text-gray-700 font-bold mb-2">Result:</h3>
-            <pre>{JSON.stringify(result, null, 2)}</pre>
-          </div>
-        )}
-      </div>
+    <div>
+      <button onClick={getCustomerInfo}>Get Customer Info</button>
+      {customerInfo && (
+        <div>
+          <h2>Customer Info</h2>
+          <table>
+            <tbody>
+              {Object.entries(customerInfo).map(([key, value]) => (
+                <tr key={key}>
+                  <td>
+                    <strong>{key}</strong>
+                  </td>
+                  <td>{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default CustomerInfo;

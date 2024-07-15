@@ -1,5 +1,5 @@
 // this is regegx for password and confirm password for register
-import { object, string, ref } from 'yup';
+import { object, string, ref, boolean } from 'yup';
 
 const getCharacterValidationError = (str: string) => {
   return `Your password must have at least 1 ${str} character`;
@@ -17,17 +17,16 @@ export const passwordSchema = object({
     .required('Please re-type your password')
     // use oneOf to match one of the values inside the array.
     // use "ref" to get the value of passwrod.
-    .oneOf([ref('password')], 'Passwords does not match')
+    .oneOf([ref('password')], 'Passwords does not match'),
+  firstName: string().max(40, 'Must be 40 characters or less').required('Required'),
+  lastName: string().max(40, 'Must be 40 characters or less').required('Required'),
+  jobTitle: string().max(40, 'Must be 40 characters or less').required('Required'),
+
+  email: string().email('Invalid email address').required('Required'),
+  acceptedTerms: boolean()
+    .required('Required')
+    .oneOf([true], 'You must accept the terms and conditions.'),
+  country: string()
+    .oneOf(['designer', 'development', 'product', 'other'], 'Invalid Job Type')
+    .required('Required')
 });
-
-// firstName: string().max(40, 'Must be 40 characters or less').required('Required'),
-// lastName: string().max(40, 'Must be 40 characters or less').required('Required'),
-// jobTitle: string().max(40, 'Must be 40 characters or less').required('Required'),
-
-// email: string().email('Invalid email address').required('Required'),
-// acceptedTerms: boolean()
-//   .required('Required')
-//   .oneOf([true], 'You must accept the terms and conditions.'),
-// country: string()
-//   .oneOf(['designer', 'development', 'product', 'other'], 'Invalid Job Type')
-//   .required('Required')

@@ -19,8 +19,6 @@ export default function Login() {
         password: password.value
       })
     );
-
-    // useEffect(() => {}, [debouncedSearchTerm]);
   }
 
   const handleCloseToast = () => {
