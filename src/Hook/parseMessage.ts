@@ -1,3 +1,5 @@
+// function qui va transformer en object la grosse chaine de charactére a chaque fois qu"elle trouve /n
+
 type ParsedMessage = { [key: string]: string };
 
 const parseMessage = (message: string): ParsedMessage => {

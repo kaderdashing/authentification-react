@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Formik, Form, useField } from 'formik';
-import * as Yup from 'yup';
 import CardShadow from './CardShadow';
 import MyTextInput from '../core/MyTextInput';
 import MySelect from '../core/MySelect';
@@ -11,51 +10,55 @@ import ModalTailwind from '@/core/modal/ModalTailwind';
 import { useQuery } from 'react-query';
 import FullPageSpinner from './pageRendu/FullPageSpinner';
 import { passwordSchema } from '@/ schema/PasswordSchema';
-import CustomerInfo from '@/pages/unAuthApp/Test';
 import { parseMessage } from '@/Hook/parseMessage';
 export default function CardRegister({ handleSubmit, customClass }) {
-  const [errorCustomer, setErrorCustomer] = useState(0);
+  const [errorCustomer, setErrorCustomer] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [customerId, setCustomerId] = useState({});
   const [company, setCompany] = useState({});
   const [customerInfo, setCustomerInfo] = useState(null);
 
-  // const [password, setPassword] = useState('');
   const debouncedValue = useDebouncedValue(inputValue, 1000);
   //here we will recover data (Adresse .. city ......) from the CustumerID with debounced value
   const fetchCustomerId = async () => {
-    // const data = { debouncedValue };
-    const customerValue = await getCustomerInfo(debouncedValue);
-    return customerValue;
+    try {
+      const customerValue = await getCustomerInfo(debouncedValue);
+      return customerValue;
+    } catch (err) {
+      throw new Error('Failed to fetch customer ID');
+    }
   };
   const { data, error, isLoading } = useQuery(['customerId', debouncedValue], fetchCustomerId, {
     enabled: !!debouncedValue,
     retry: false,
     onSuccess: (data) => {
       setCustomerId(data);
-      // console.log(data);
       setCompany(data);
       const parsedMessage = parseMessage(data);
+      console.log({ parsedMessage: parsedMessage });
       setCustomerInfo(parsedMessage);
+      setErrorCustomer(false);
     },
-    onError: () => {
+    onError: (error) => {
       console.error('Failed to fetch customer ID:', error);
-      setErrorCustomer(1);
+      setErrorCustomer(true);
     }
   });
 
   useEffect(() => {
-    console.log({ CustomerInfo: customerInfo });
-  }, [customerInfo]);
+    if (customerInfo === null && debouncedValue) {
+      setErrorCustomer(true);
+    }
+  }, [customerInfo, debouncedValue]);
 
   useEffect(() => {
     if (!debouncedValue) {
       setCustomerId({});
       setCompany({});
-      setErrorCustomer(0);
+      setCustomerInfo(null);
+      setErrorCustomer(false);
     }
   }, [debouncedValue]);
-  // function qui va transformer en object la grosse chaine de charactére a chaque fois qu"elle trouve /n
 
   return (
     <div className="flex justify-center items-center" style={{ height: '95%' }}>
@@ -65,8 +68,8 @@ export default function CardRegister({ handleSubmit, customClass }) {
         <></>
       ) : (
         <>
-          {customerId && debouncedValue && (
-            <ModalTailwind ModalTitle="Error" body="erreur id non valide" />
+          {errorCustomer && debouncedValue && (
+            <ModalTailwind ModalTitle="Error" body="Erreur ID non valide" />
           )}
         </>
       )}
