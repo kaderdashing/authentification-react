@@ -248,13 +248,15 @@ export default function CardRegister({ handleSubmit, customClass }) {
 
                     <button
                       type="submit"
-                      disabled={isSubmitting || !isValid}
-                      className={`w-full px-4 py-2 rounded-md focus:outline-none ${
-                        !isValid
-                          ? 'bg-gray-400 cursor-not-allowed'
-                          : 'bg-green-800 text-white hover:bg-green-700 focus:bg-green-700'
-                      }`}>
+                      // disabled={isSubmitting || !isValid}
+                      className={`w-full px-4 py-2 rounded-md focus:outline-none 
+                     bg-green-800 text-white hover:bg-green-700 focus:bg-green-700
+                        `}>
                       Register now
+                      {/* // ${ 
+                        // !isValid || isSubmitting
+                        //   ? 'bg-gray-400 cursor-not-allowed'
+                        //   : 'bg-green-800 text-white hover:bg-green-700 focus:bg-green-700' } */}
                     </button>
                   </div>
                 </div>

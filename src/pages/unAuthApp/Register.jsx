@@ -8,12 +8,14 @@ export default function Register() {
   const { register } = useAuth();
 
   function handleSubmit(event) {
+    console.log('je suis la function de handel submit du register et je marche ');
     event.preventDefault();
-    const { username, password } = event.target.elements;
+    const { firstName, password } = event.target.elements;
+    console.log({ firstName: firstName.value, password: password.value });
     // la function run a besoin d'une promise pour passer du mode deconecter au mode connecter
     run(
       register({
-        username: username.value,
+        username: firstName.value,
         password: password.value
       })
     );
@@ -34,18 +36,6 @@ export default function Register() {
   return (
     <div className="h-full">
       <CardResgister handleSubmit={handleSubmit} customClass=" justify-center " />
-
-      {/* <form onSubmit={handleSubmit}>
-        <label>userName</label>
-        <input
-          name="username"
-          type="text"
-          defaultValue="eve.holt@reqres.in"
-        ></input>
-        <label>password</label>
-        <input name="password" type="password"></input>
-        <button type="submit">signUp</button>
-      </form> */}
     </div>
   );
 }
