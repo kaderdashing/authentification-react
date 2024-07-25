@@ -4,7 +4,7 @@ type ParsedMessage = { [key: string]: string };
 
 const parseMessage = (message: string): ParsedMessage => {
   if (!message) {
-    throw new Error('Message is undefined or empty 2');
+    throw new Error('Message is undefined or empty ');
   }
 
   const lines = message.split('\n');

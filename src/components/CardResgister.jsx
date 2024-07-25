@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Formik, Form, useField } from 'formik';
+import { Formik, Form, useField, Field } from 'formik';
 import CardShadow from './CardShadow';
 import MyTextInput from '../core/MyTextInput';
 import MySelect from '../core/MySelect';
@@ -11,18 +11,19 @@ import { useQuery } from 'react-query';
 import FullPageSpinner from './pageRendu/FullPageSpinner';
 import { passwordSchema } from '@/ schema/PasswordSchema';
 import { parseMessage } from '@/Hook/parseMessage';
-export default function CardRegister({ handleSubmit, customClass }) {
+export default function CardRegister({ handleSubmit, customClass, onChangeSomeState }) {
   const [errorCustomer, setErrorCustomer] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [customerId, setCustomerId] = useState({});
   const [company, setCompany] = useState({});
   const [customerInfo, setCustomerInfo] = useState(null);
-
+  // const [customToPast, setCustomToPast] = useState(null); // ce state on va le passer a la function handelsubmit car le input de customerId ce démonte (unMounted Fild) est c'est contraire au régle de yup donc il le met a null
   const debouncedValue = useDebouncedValue(inputValue, 1000);
   //here we will recover data (Adresse .. city ......) from the CustumerID with debounced value
   const fetchCustomerId = async () => {
     try {
       const customerValue = await getCustomerInfo(debouncedValue);
+      onChangeSomeState(customerValue);
       return customerValue;
     } catch (err) {
       throw new Error('Failed to fetch customer ID');
@@ -39,6 +40,7 @@ export default function CardRegister({ handleSubmit, customClass }) {
       setCustomerInfo(parsedMessage);
       setErrorCustomer(false);
     },
+    // parsedMessage.CustID
     onError: (error) => {
       console.error('Failed to fetch customer ID:', error);
       setErrorCustomer(true);
@@ -99,12 +101,19 @@ export default function CardRegister({ handleSubmit, customClass }) {
           country: '' // added for our select
         }}
         validationSchema={passwordSchema}
-        onSubmit={(values, { setSubmitting }) => {
+        // onSubmit={(values, { setSubmitting }) => {
+        //   console.log(values);
+        //   setSubmitting(false);
+        // }}
+        onSubmit={(values) => {
+          // same shape as initial values
+
           console.log(values);
-          setSubmitting(false);
+          console.log(customerInfo.CustID);
+          handleSubmit(values, customerInfo.CustID);
         }}>
-        {({ isSubmitting, isValid }) => (
-          <Form className="h-full w-full" onSubmit={handleSubmit}>
+        {({ isSubmitting, isValid, errors }) => (
+          <Form className="h-full w-full">
             <div className={`flex justify-center items-center h-full ${customClass} `}>
               <CardShadow
                 customClass={` w-11/12  p-4 h-max shadow-md bg-white bg-opacity-60 flex flex-col lg:flex-row lg:space-x-4 gap-3 `}>
@@ -248,15 +257,14 @@ export default function CardRegister({ handleSubmit, customClass }) {
 
                     <button
                       type="submit"
-                      // disabled={isSubmitting || !isValid}
-                      className={`w-full px-4 py-2 rounded-md focus:outline-none 
-                     bg-green-800 text-white hover:bg-green-700 focus:bg-green-700
-                        `}>
+                      className={`w-full px-4 py-2 rounded-md focus:outline-none
+                       bg-green-800 text-white hover:bg-green-700 focus:bg-green-700
+                          `}>
                       Register now
                       {/* // ${ 
-                        // !isValid || isSubmitting
-                        //   ? 'bg-gray-400 cursor-not-allowed'
-                        //   : 'bg-green-800 text-white hover:bg-green-700 focus:bg-green-700' } */}
+                        !isValid || isSubmitting
+                          ? 'bg-gray-400 cursor-not-allowed'
+                          : 'bg-green-800 text-white hover:bg-green-700 focus:bg-green-700' } */}
                     </button>
                   </div>
                 </div>

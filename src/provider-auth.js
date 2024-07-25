@@ -20,19 +20,18 @@ function login({ email, password }) {
   return client('login', { email, password }).then(handleUserResponse);
 }
 
-function register({ email, password }) {
-  return client('register', { email, password }).then(handleUserResponse);
+function register({ email, password, customer_id, first_name, last_name, job_title, lang }) {
+  return client('register', {
+    email,
+    password,
+    customer_id,
+    first_name,
+    last_name,
+    job_title,
+    lang
+  }).then(handleUserResponse);
 }
-// const getCustomerId = async (data) => {
-//   try {
-//     const response = await client('check-account', { data });
-//     console.log({ youcef: response });
-//     return response;
-//   } catch (error) {
-//     console.error('Error fetching customer ID:', error);
-//     throw error;
-//   }
-// };
+
 async function logout() {
   window.localStorage.removeItem(localStorageKey);
 }

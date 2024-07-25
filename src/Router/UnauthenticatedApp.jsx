@@ -3,7 +3,7 @@ import { Link, Route, Routes, NavLink } from 'react-router-dom';
 import RedirectToLogin from '../pages/unAuthApp/RedirectToLogin.jsx';
 import Login from '../pages/unAuthApp/Login.jsx';
 import Register from '../pages/unAuthApp/Register.jsx';
-import Test from '../pages/unAuthApp/Test.jsx';
+import { DisplayingErrorMessagesExample } from '../pages/unAuthApp/Test.jsx';
 
 import Footer from '../components/Footer.jsx';
 import PartFooter from '../core/Footer/PartFooter.jsx';
@@ -20,7 +20,7 @@ function AppRoutes() {
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/test" element={<Test />} />
+      <Route path="/test" element={<DisplayingErrorMessagesExample />} />
       <Route path="*" element={<RedirectToLogin />} />{' '}
     </Routes>
   );
