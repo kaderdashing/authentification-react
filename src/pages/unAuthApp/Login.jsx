@@ -2,7 +2,6 @@ import React from 'react';
 import { useAsync } from '../../utils/hooks';
 import { useAuth } from '../../context/auth-context.jsx';
 import CardLogin from '../../components/CardLogin.jsx';
-import { useEffect } from 'react';
 import Toast from '@/core/Toast/Toast';
 import { useState } from 'react';
 

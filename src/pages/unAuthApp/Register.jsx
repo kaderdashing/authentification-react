@@ -3,6 +3,7 @@ import { useAsync } from '../../utils/hooks';
 import { useAuth } from '../../context/auth-context.jsx';
 import CardResgister from '../../components/CardResgister.jsx';
 import { useState } from 'react';
+import FullPageSpinner from '@/components/pageRendu/FullPageSpinner';
 
 export default function Register() {
   const { isLoading, isError, error, run } = useAsync();
@@ -11,21 +12,10 @@ export default function Register() {
   const onChangeSomeState = (newSomeState) => {
     setCustomToPast(newSomeState);
   };
-  function handleSubmit(event, CustID) {
-    // event.preventDefault();
-    // console.log({ ...event });
-    // console.log({ someOne: someOne });
+  async function handleSubmit(event, CustID) {
     const { firstName, password, lastName, jobTitle, email } = { ...event };
-    // console.log({
-    //   firstName: firstName,
-    //   password: password,
-    //   lastName: lastName,
-    //   jobTitle: jobTitle,
-    //   customerId: CustID,
-    //   email: email
-    // });
     // la function run a besoin d'une promise pour passer du mode deconecter au mode connecter
-    run(
+    await run(
       register({
         email: email,
         password: password,
@@ -40,7 +30,16 @@ export default function Register() {
   if (isLoading)
     return (
       <>
-        loading ...... <div> ........loading</div>
+        <>
+          <div className="h-full">
+            <CardResgister
+              handleSubmit={handleSubmit}
+              onChangeSomeState={onChangeSomeState}
+              customClass=" justify-center "
+            />
+          </div>
+          <FullPageSpinner />
+        </>{' '}
       </>
     );
   if (isError)
@@ -51,12 +50,14 @@ export default function Register() {
       </>
     );
   return (
-    <div className="h-full">
-      <CardResgister
-        handleSubmit={handleSubmit}
-        onChangeSomeState={onChangeSomeState}
-        customClass=" justify-center "
-      />
-    </div>
+    <>
+      <div className="h-full">
+        <CardResgister
+          handleSubmit={handleSubmit}
+          onChangeSomeState={onChangeSomeState}
+          customClass=" justify-center "
+        />
+      </div>
+    </>
   );
 }

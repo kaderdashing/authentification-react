@@ -36,7 +36,6 @@ export default function CardRegister({ handleSubmit, customClass, onChangeSomeSt
       setCustomerId(data);
       setCompany(data);
       const parsedMessage = parseMessage(data);
-      console.log({ parsedMessage: parsedMessage });
       setCustomerInfo(parsedMessage);
       setErrorCustomer(false);
     },
@@ -97,19 +96,11 @@ export default function CardRegister({ handleSubmit, customClass, onChangeSomeSt
           city: '',
           prov: '',
           zip: '',
-          acceptedTerms: true, // added for our checkbox
-          country: '' // added for our select
+          acceptedTerms: true,
+          country: ''
         }}
         validationSchema={passwordSchema}
-        // onSubmit={(values, { setSubmitting }) => {
-        //   console.log(values);
-        //   setSubmitting(false);
-        // }}
         onSubmit={(values) => {
-          // same shape as initial values
-
-          console.log(values);
-          console.log(customerInfo.CustID);
           handleSubmit(values, customerInfo.CustID);
         }}>
         {({ isSubmitting, isValid, errors }) => (
