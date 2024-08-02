@@ -47,8 +47,8 @@ function AuthProvider(props) {
   );
 
   const register = React.useCallback(
-    (form) => {
-      auth.register(form).then((user) => setData(user));
+    async (form) => {
+      await auth.register(form).then((user) => setData(user));
     },
     [setData]
   );
@@ -89,7 +89,6 @@ function useAuth() {
 
 function useClient() {
   const { user } = useAuth();
-  console.log({ user });
   const token = user?.token;
   return React.useCallback((endpoint, config) => client(endpoint, { ...config, token }), [token]);
 }

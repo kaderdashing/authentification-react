@@ -2,26 +2,44 @@ import React from 'react';
 import { useAsync } from '../../utils/hooks';
 import { useAuth } from '../../context/auth-context.jsx';
 import CardResgister from '../../components/CardResgister.jsx';
+import { useState } from 'react';
+import FullPageSpinner from '@/components/pageRendu/FullPageSpinner';
 
 export default function Register() {
   const { isLoading, isError, error, run } = useAsync();
   const { register } = useAuth();
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    const { username, password } = event.target.elements;
+  const [customToPast, setCustomToPast] = useState(null);
+  const onChangeSomeState = (newSomeState) => {
+    setCustomToPast(newSomeState);
+  };
+  async function handleSubmit(event, CustID) {
+    const { firstName, password, lastName, jobTitle, email } = { ...event };
     // la function run a besoin d'une promise pour passer du mode deconecter au mode connecter
-    run(
+    await run(
       register({
-        username: username.value,
-        password: password.value
+        email: email,
+        password: password,
+        customer_id: CustID,
+        first_name: firstName,
+        last_name: lastName,
+        job_title: jobTitle,
+        lang: 'fr'
       })
     );
   }
   if (isLoading)
     return (
       <>
-        loading ...... <div> ........loading</div>
+        <>
+          <div className="h-full">
+            <CardResgister
+              handleSubmit={handleSubmit}
+              onChangeSomeState={onChangeSomeState}
+              customClass=" justify-center "
+            />
+          </div>
+          <FullPageSpinner />
+        </>{' '}
       </>
     );
   if (isError)
@@ -32,20 +50,14 @@ export default function Register() {
       </>
     );
   return (
-    <div className="h-full">
-      <CardResgister handleSubmit={handleSubmit} customClass=" justify-center " />
-
-      {/* <form onSubmit={handleSubmit}>
-        <label>userName</label>
-        <input
-          name="username"
-          type="text"
-          defaultValue="eve.holt@reqres.in"
-        ></input>
-        <label>password</label>
-        <input name="password" type="password"></input>
-        <button type="submit">signUp</button>
-      </form> */}
-    </div>
+    <>
+      <div className="h-full">
+        <CardResgister
+          handleSubmit={handleSubmit}
+          onChangeSomeState={onChangeSomeState}
+          customClass=" justify-center "
+        />
+      </div>
+    </>
   );
 }
