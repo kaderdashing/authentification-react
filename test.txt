@@ -1,0 +1,38 @@
+* Add checkbox to tell if the user wanna add Markup for certain brands/categories or for all products
+
+* if user choose category {
+    - choose brand from that category,
+    - make markup for the whole category (check the box)
+}
+
+* disable date fields if isDefault is checked
+
+* checkbox to specify brands not for the category (by default user choose markup for category)
+
+
+HOW TO APPLY MARKUP:
+
+-check if there is temporary markup for brand
+-check default markup for brand,
+-check temporary markup for category
+-check default markup for category
+-check default markup for all products
+
+operations
+.
+.
+.
+
+check the right markup
+
+.
+.
+.
+.
+
+get pricing,
+get fees,
+get markup
+
+
+

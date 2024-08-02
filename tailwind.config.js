@@ -8,6 +8,7 @@ module.exports = {
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}'
   ],
+  darkMode: "class",
   prefix: '',
   theme: {
     container: {
