@@ -20,7 +20,7 @@ const ProductsCollection = ({ result }) => {
   };
   return (
     <>
-      <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-2 xl:gap-10">
+      <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-1 xl:gap-10">
         {result?.data?.map((product, index) => (
           <ProductCard2 key={index} product={product} />
         ))}
@@ -29,20 +29,21 @@ const ProductsCollection = ({ result }) => {
       <div className="w-full flex items-center justify-center mt-6">
         <ReactPaginate
           breakLabel="..."
-          previousLabel={Number(currentPage) === 1 ? null : <ChevronLeft size={24} />}
+          previousLabel={<ChevronLeft size={24} />}
           nextLabel={
-            Number(currentPage) === result?.meta?.total ? null : <ChevronRight size={24} />
+             <ChevronRight size={24} />
           }
-          pageClassName={'page-item'}
+          pageClassName={'py-1.5 px-3'}
           onPageChange={handlePageClick}
           pageRangeDisplayed={2}
-          pageCount={result?.meta?.total}
+          pageCount={ Math.ceil(result?.meta?.total / result?.meta?.per_page)}
           renderOnZeroPageCount={null}
-          containerClassName="pagination"
-          activeClassName="active"
-          previousLinkClassName="previous"
-          nextLinkClassName="next"
-          disabledClassName="disabled"
+          containerClassName="pagination flex justify-center mt-4 gap-4"
+          activeClassName="active bg-green-primary  text-white"
+          previousLinkClassName="previous mr-2 flex items-center justify-center px-3 py-1 border border-gray-300 rounded hover:bg-gray-200"
+          nextLinkClassName="next ml-2 flex items-center justify-center px-3 py-1 border border-gray-300 rounded hover:bg-gray-200"
+          disabledClassName="disabled opacity-50 cursor-not-allowed"
+          initialPage={(parseInt(searchParams.get("page")) || 1) - 1}
         />
       </div>
     </>
